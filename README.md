@@ -1,16 +1,18 @@
 <img src=https://raw.githubusercontent.com/databricks-industry-solutions/.github/main/profile/solacc_logo.png width="600px">
 
-[![DBR](https://img.shields.io/badge/DBR-CHANGE_ME-red?logo=databricks&style=for-the-badge)](https://docs.databricks.com/release-notes/runtime/CHANGE_ME.html)
-[![CLOUD](https://img.shields.io/badge/CLOUD-CHANGE_ME-blue?logo=googlecloud&style=for-the-badge)](https://databricks.com/try-databricks)
+[![DBR](https://img.shields.io/badge/DBR-14.3ML-red?logo=databricks&style=for-the-badge)](https://docs.databricks.com/release-notes/runtime/14.3lts-ml.html)
+[![CLOUD](https://img.shields.io/badge/CLOUD-ALL-blue?logo=googlecloud&style=for-the-badge)](https://databricks.com/try-databricks)
 
-## Business Problem
-WHAT IS THE BUSINESS PROBLEM ADDRESSED BY THIS SOLUTION
+## Challenges Addressed
+Today, field maintenance is often reactive, rather than proactive, which can lead to costly downtime and repairs. However, with Databricks businesses can implement predictive maintenance strategies that allow them to identify and address potential issues before they become customer facing problems. Databricks provides end-to-end machine learning solutions including tools for data preparation, model training, and root cause analysis reporting. 
+
+Scaling existing codebases and skill sets is a key theme when it comes to using Databricks for data and AI workloads, particularly given the large data volumes that are common in IOT and anomaly detection use cases. For instance, a business may be experiencing an increase in engine defect rates without a clear reason, and they may already have a team of data scientists who are skilled in using Pandas for data manipulation and analysis on small subsets of their data - for example, analyzing particularly notable trips one at a time. By using Databricks, these teams can easily apply their existing Pandas code to their entire large-scale IOT dataset, without having to learn a completely new set of tools and technologies to deploy and maintain the solution. Additionally, ML experimentation is often done in silos, with data scientists working locally and manually on their own machines on different copies of data. This can lead to a lack of reproducibility and collaboration, making it difficult to run ML efforts across an organization. Databricks addresses this challenge by enabling MLflow, an open-source tool for unified machine learning model experimentation, registry, and deployment. With MLflow, data scientists can collaboratively track and reproduce their experiments, as well as deploy their models into production.
 
 ## Reference Architecture
-IMAGE TO REFERENCE ARCHITECTURE
+<img src='https://raw.githubusercontent.com/databricks-industry-solutions/iot_distributed_ml/master/images/reference_architecture.png' width=800>
 
 ## Authors
-<john.doe@databricks.com>
+josh.melton@databricks.com
 
 ## Project support 
 
@@ -20,7 +22,4 @@ Any issues discovered through the use of this project should be filed as GitHub 
 
 ## License
 
-&copy; 2024 Databricks, Inc. All rights reserved. The source in this notebook is provided subject to the Databricks License [https://databricks.com/db-license-source].  All included or referenced third party libraries are subject to the licenses set forth below.
-
-| library                                | description             | license    | source                                              |
-|----------------------------------------|-------------------------|------------|-----------------------------------------------------|
+&copy; 2024 Databricks, Inc. All rights reserved. The source in this notebook is provided subject to the Databricks License [https://databricks.com/db-license-source].
