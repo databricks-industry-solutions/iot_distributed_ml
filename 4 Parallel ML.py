@@ -356,5 +356,4 @@ inference_model.predict(bronze_df.drop('defect').sample(.01).toPandas())
 # MAGIC - parallelizing pandas operations
 # MAGIC - hyperparameter tuning
 # MAGIC - custom MLflow models
-# MAGIC
-# MAGIC The next notebook is a bonus for if you're interested in combining the distributed processing power of Databricks with popular deep learning frameworks
+# MAGIC </br>Armed with these tools, you should now feel more confident in scaling standard ML workflows
