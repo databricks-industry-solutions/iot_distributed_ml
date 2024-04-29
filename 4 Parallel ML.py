@@ -344,7 +344,8 @@ class OriginDelegatingModel(PythonModel):
 model_map = {row['model_id']: mlflow.pyfunc.load_model(f'runs:/{row["run_id"]}/combo_model_{row["model_id"]}')
              for row in model_info.collect()}
 inference_model = OriginDelegatingModel(model_map)
-inference_model.predict(bronze_df.drop('defect').sample(.01).toPandas())
+delegated_predictions = inference_model.predict(bronze_df.drop('defect').sample(.01).toPandas())
+display(delegated_predictions)
 
 # COMMAND ----------
 
