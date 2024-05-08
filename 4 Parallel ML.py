@@ -64,7 +64,6 @@ rolling_temp_schema = '''
 # Translate the dataframe back to Spark and apply our pandas function in parallel
 features_spark = features_ps.to_spark()
 features_temp = features_spark.groupBy('device_id', 'trip_id').applyInPandas(add_rolling_temp, rolling_temp_schema)
-features_temp.display()
 
 # COMMAND ----------
 
@@ -90,7 +89,6 @@ rolling_density_schema = '''
 '''
 
 features_density = features_temp.groupBy('device_id').applyInPandas(add_rolling_density, rolling_density_schema)
-features_density.display()
 
 # COMMAND ----------
 
@@ -120,7 +118,6 @@ def create_forecast_arima(order):
 # Minimal Spark code - just select one column and add another. We can still use Pandas for our logic
 forecast_arima = create_forecast_arima((1, 2, 4))
 features_arima = features_density.withColumn('predicted_temp', forecast_arima('temperature'))
-features_arima.display()
 
 # COMMAND ----------
 
@@ -243,6 +240,7 @@ class FeaturesAndPredictionModel(mlflow.pyfunc.PythonModel):
         return pdf
     
     def forecast_arima(self, pdf: pd.DataFrame) -> pd.DataFrame:
+        mlflow.autolog(disable=True)
         model = ARIMA(pdf.temperature, order=self.order)
         model_fit = model.fit()
         pdf['predicted_temp'] = model_fit.predict()
@@ -286,7 +284,6 @@ with mlflow.start_run() as run:
     mlflow.pyfunc.log_model('combo_model', python_model=combo_model, input_example=raw) 
 
 custom_model = mlflow.pyfunc.load_model(f'runs:/{run.info.run_id}/combo_model')
-display(custom_model.predict(raw)) # test that our model works for feature generation and predictions
 
 # COMMAND ----------
 
@@ -300,6 +297,7 @@ display(custom_model.predict(raw)) # test that our model works for feature gener
 
 # COMMAND ----------
 
+# DBTITLE 1,Create Nested Models
 def single_model_run(pdf: pd.DataFrame) -> pd.DataFrame:
     run_id = pdf["run_id"].iloc[0]
     model_id = pdf["model_id"].iloc[0]
@@ -330,22 +328,33 @@ model_info.display()
 
 # COMMAND ----------
 
+# DBTITLE 1,Create Delegating Model
 from mlflow.pyfunc import PythonModel
 
 class OriginDelegatingModel(PythonModel):
     def __init__(self, model_map):
         self.model_map = model_map
-    
-    def predict(self, model_input):
-        model_id = model_input.iloc[0]['model_id']
-        model = self.model_map.get(model_id)
-        return model.predict(model_input)
+
+    def predict_for_model(self, model_group):
+        model_id = model_group.iloc[0]['model_id']
+        ml_model = self.model_map.get(model_id)
+        return ml_model.predict(model_group)
+
+    def predict(self, context, model_input):
+        return model_input.groupby("model_id").apply(self.predict_for_model)
 
 model_map = {row['model_id']: mlflow.pyfunc.load_model(f'runs:/{row["run_id"]}/combo_model_{row["model_id"]}')
              for row in model_info.collect()}
 inference_model = OriginDelegatingModel(model_map)
-delegated_predictions = inference_model.predict(bronze_df.drop('defect').sample(.01).toPandas())
+delegated_predictions = inference_model.predict(None, bronze_df.drop('defect').sample(.01).toPandas())
 display(delegated_predictions)
+
+# COMMAND ----------
+
+# DBTITLE 1,Log Final Model
+with mlflow.start_run():
+    model = OriginDelegatingModel(model_map)
+    mlflow.pyfunc.log_model("model", python_model=inference_model)
 
 # COMMAND ----------
 
